@@ -15,37 +15,33 @@
 
 <body>
 	<script>
-		async function getProjects(allWorks) {
+		let allWorks = [];
+
+		async function getProjects() {
 			const url = "http://localhost:5678/api/works";
-			try {
-				const response = await fetch(url);
-				if (!response.ok) {
-					throw new Error(`Response status: ${response.status}`);
-				}
-				const works = await response.json();
-				allWorks = works;
-				const gallery = document.querySelector(".gallery");
+			const response = await fetch(url);
+			const works = await response.json();
+			allWorks = works;
+			renderGallery(allWorks);
+		}
+		function renderGallery(works) {
+			const gallery = document.querySelector(".gallery");
+			gallery.innerHTML = "";
 
-				gallery.innerHTML = "";
+			works.forEach(work => {
+				const figure = document.createElement("figure");
 
-				works.forEach(work => {
-					const figure = document.createElement("figure");
+				const img = document.createElement("img");
+				img.src = work.imageUrl;
+				img.alt = work.title;
 
-					const img = document.createElement("img");
-					img.src = work.imageUrl;
-					img.alt = work.title;
+				const figcaption = document.createElement("figcaption");
+				figcaption.textContent = work.title;
 
-					const figcaption = document.createElement("figcaption");
-					figcaption.textContent = work.title;
-
-					figure.appendChild(img);
-					figure.appendChild(figcaption);
-
-					gallery.appendChild(figure);
-				});
-			} catch (error) {
-				console.error(error.message);
-			}
+				figure.appendChild(img);
+				figure.appendChild(figcaption);
+				gallery.appendChild(figure);
+			});
 		}
 		async function getFilters() {
 			const url = "http://localhost:5678/api/categories";
@@ -56,40 +52,51 @@
 				}
 				const categories = await response.json();
 				const filtersContainer = document.getElementById("filters");
+
+				const allBtn = document.createElement("button");
+				allBtn.textContent = "All";
+				allBtn.classList.add("btn-filter", "active");
+				allBtn.setAttribute("data-filter", "all");
+				filtersContainer.appendChild(allBtn);
 				categories.forEach(category => {
 					const button = document.createElement("button");
+					button.create
 					button.textContent = category.name;
 					button.setAttribute("class", "btn-filter");
 					button.setAttribute("data-filter", category.id);
 					filtersContainer.appendChild(button);
+
 				})
+
 			} catch (error) {
 				console.error(error.message);
 			}
+			setFilters();
 		}
 		function setFilters() {
 			const buttons = document.querySelectorAll(".btn-filter");
 
 			buttons.forEach(btn => {
 				btn.addEventListener("click", () => {
-					buttons.forEach(active => active.classList.remove("active"));
+					buttons.forEach(b => b.classList.remove("active"));
 					btn.classList.add("active");
 
-					const catId = btn.getAttribute("data-filter");
-					let filterWorks = allWorks;
-
-					if (catId !== "all") {
-						filterWorks = allWorks.filter(work => work.catId === Number(categoryId));
+					const catId = btn.dataset.filter;
+					let filteredWorks;
+					if (catId === "all") {
+						filteredWorks = allWorks;
+					} else {
+						filteredWorks = allWorks.filter(
+							work => work.categoryId === Number(catId)
+						);
 					}
-					getProjects(filterWorks);
+					renderGallery(filteredWorks);
 				});
 			});
 		}
 		document.addEventListener("DOMContentLoaded", () => {
 			getProjects();
-			setFilters();
 			getFilters();
-
 		});
 	</script>
 	<header>
@@ -121,9 +128,7 @@
 		</section>
 		<section id="portfolio">
 			<h2>My Projects</h2>
-			<div id="filters">
-				<button class="btn-filter" data-filter="all">All</button>
-			</div>
+			<div id="filters"></div>
 			<div class="gallery"></div>
 		</section>
 		<section id="contact">

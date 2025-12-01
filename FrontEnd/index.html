@@ -86,14 +86,13 @@
 					if (catId === "all") {
 						filteredWorks = allWorks;
 					} else {
-						filteredWorks = allWorks.filter(
-							work => work.categoryId === Number(catId)
-						);
+						filteredWorks = allWorks.filter(work => work.categoryId === Number(catId));
 					}
 					renderGallery(filteredWorks);
 				});
 			});
 		}
+
 		document.addEventListener("DOMContentLoaded", () => {
 			getProjects();
 			getFilters();

@@ -11,12 +11,11 @@
 		rel="stylesheet">
 	<meta name="description" content="">
 	<link rel="stylesheet" href="./assets/style.css">
-</head>
-
-<body>
 	<script>
 		let allWorks = [];
-
+		let categories = [];
+		let activeFilterId = 'all';
+		let activeProjects;
 		async function getProjects() {
 			const url = "http://localhost:5678/api/works";
 			const response = await fetch(url);
@@ -26,11 +25,9 @@
 		}
 		function renderGallery(works) {
 			const gallery = document.querySelector(".gallery");
-			gallery.innerHTML = "";
-
+			activeProjects = [];
 			works.forEach(work => {
 				const figure = document.createElement("figure");
-
 				const img = document.createElement("img");
 				img.src = work.imageUrl;
 				img.alt = work.title;
@@ -40,8 +37,10 @@
 
 				figure.appendChild(img);
 				figure.appendChild(figcaption);
-				gallery.appendChild(figure);
+				activeProjects.push(figure);
+				console.log(activeProjects);
 			});
+			gallery.replaceChildren(...activeProjects);
 		}
 		async function getFilters() {
 			const url = "http://localhost:5678/api/categories";
@@ -56,15 +55,14 @@
 				const allBtn = document.createElement("button");
 				allBtn.textContent = "All";
 				allBtn.classList.add("btn-filter", "active");
-				allBtn.setAttribute("data-filter", "all");
+				allBtn.setAttribute("id", "all");
 				filtersContainer.appendChild(allBtn);
 				categories.forEach(category => {
 					const button = document.createElement("button");
 					button.textContent = category.name;
 					button.setAttribute("class", "btn-filter");
-					button.setAttribute("data-filter", category.id);
+					button.setAttribute("id", category.id);
 					filtersContainer.appendChild(button);
-
 				})
 
 			} catch (error) {
@@ -77,26 +75,35 @@
 
 			buttons.forEach(btn => {
 				btn.addEventListener("click", () => {
-					buttons.forEach(b => b.classList.remove("active"));
+					let activeBtn = document.getElementById(activeFilterId)
+					console.log(activeBtn);
+					//remove active class
+					activeBtn.classList.remove("active");
+					//add active class
 					btn.classList.add("active");
-
-					const catId = btn.dataset.filter;
-					let filteredWorks;
-					if (catId === "all") {
-						filteredWorks = allWorks;
+					//update active id
+					activeFilterId = btn.id;
+					//first create var to store all projects
+					//check all to show all projects
+					if (activeFilterId === "all") {
+						activeProjects = allWorks;
+						console.log(activeProjects);
 					} else {
-						filteredWorks = allWorks.filter(work => work.categoryId === Number(catId));
+						activeProjects = allWorks.filter(work => work.categoryId === Number(activeFilterId));
 					}
-					renderGallery(filteredWorks);
+					renderGallery(activeProjects);
 				});
 			});
 		}
-
 		document.addEventListener("DOMContentLoaded", () => {
 			getProjects();
 			getFilters();
 		});
 	</script>
+</head>
+
+<body>
+
 	<header>
 		<h1>Sophie Bluel <span>Interior Designer</span></h1>
 		<nav>

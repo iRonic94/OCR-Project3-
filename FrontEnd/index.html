@@ -13,9 +13,7 @@
 	<link rel="stylesheet" href="./assets/style.css">
 	<script>
 		let allWorks = [];
-		let categories = [];
 		let activeFilterId = 'all';
-		let activeProjects;
 		async function getProjects() {
 			const url = "http://localhost:5678/api/works";
 			const response = await fetch(url);
@@ -83,15 +81,16 @@
 					btn.classList.add("active");
 					//update active id
 					activeFilterId = btn.id;
-					//first create var to store all projects
 					//check all to show all projects
 					if (activeFilterId === "all") {
-						activeProjects = allWorks;
-						console.log(activeProjects);
+						var filteredProjects = allWorks;
 					} else {
-						activeProjects = allWorks.filter(work => work.categoryId === Number(activeFilterId));
+						//filter projects based on category selection
+						filteredProjects = allWorks.filter(work => work.categoryId === Number(activeFilterId));
+						console.log("allWorks:", allWorks)
 					}
-					renderGallery(activeProjects);
+					console.log("filtered projects: ", filteredProjects)
+					renderGallery(filteredProjects);
 				});
 			});
 		}
@@ -108,9 +107,9 @@
 		<h1>Sophie Bluel <span>Interior Designer</span></h1>
 		<nav>
 			<ul>
-				<li>projects</li>
-				<li>contact</li>
-				<li>login</li>
+				<li><a href="#">projects</a></li>
+				<li><a href="#">contact</a></li>
+				<li><a href="login.html">login</a></li>
 				<li><img src="./assets/icons/instagram.png" alt="Instagram"></li>
 			</ul>
 		</nav>

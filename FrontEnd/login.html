@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<body>
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Sophie Bluel - Interior Designer</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Work+Sans&display=swap"
+            rel="stylesheet">
+        <meta name="description" content="">
+        <link rel="stylesheet" href="./assets/style.css">
+        <script>
+            async function login() {
+                const url = "http://localhost:5678/api/users/login";
+                const response = await fetch(url);
+                const login = await response.json();
+                console.log(login);
+            }
+            function executeLogin() {
+                const btnSubmit = document.getElementById("submit");
+                console.log(btnSubmit);
+
+            }
+            document.addEventListener("DOMContentLoaded", () => {
+                login();
+                executeLogin();
+            });
+        </script>
+    </head>
+    <header>
+        <h1>Sophie Bluel <span>Interior Designer</span></h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">projects</a></li>
+                <li><a href="#">contact</a></li>
+                <li><a href="#">login</a></li>
+                <li><img src="./assets/icons/instagram.png" alt="Instagram"></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="login">
+
+            <form id="form_id" method="post" name="myform">
+                <label>USER:</label>
+                <input type="text" name="username" id="username" />
+                <label>PASS:</label>
+                <input type="password" name="password" id="password" />
+                <input type="button" value="login" id="submit" />
+            </form>
+
+        </section>
+    </main>
+
+    <footer>
+        <nav>
+            <ul>
+                <li>Legal Notice</li>
+            </ul>
+        </nav>
+    </footer>
+</body>
+
+</html>

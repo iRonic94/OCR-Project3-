@@ -314,3 +314,8 @@ footer nav ul {
 	justify-content: flex-end;
 	margin: 2em
 }
+
+a {
+	text-decoration: unset;
+	color: unset;
+}

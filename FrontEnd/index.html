@@ -12,8 +12,9 @@
 	<meta name="description" content="">
 	<link rel="stylesheet" href="./assets/style.css">
 	<script>
-		let allWorks = [];
-		let activeFilterId = 'all';
+		var allWorks = [];
+		var activeFilterId = 'all';
+
 		async function getProjects() {
 			const url = "http://localhost:5678/api/works";
 			const response = await fetch(url);
@@ -94,9 +95,34 @@
 				});
 			});
 		}
+
+		function loggedIn() {
+			var token = localStorage.getItem("token");
+			var login = document.getElementById("nav-login");
+			var logout = document.getElementById("nav-logout");
+			var filters = document.getElementById("filters");
+			if (token) {
+				login.style.display = 'none';
+				filters.style.display = 'none';
+				logout.style.display = 'block';
+
+			} else {
+				logout.style.display = 'none'
+				login.style.display = 'block';
+			}
+		}
+		function logOut() {
+			var logout = document.getElementById("nav-logout");
+			logout.addEventListener("click", () => {
+				localStorage.setItem("token", "");
+			})
+
+		}
 		document.addEventListener("DOMContentLoaded", () => {
 			getProjects();
 			getFilters();
+			loggedIn();
+			logOut();
 		});
 	</script>
 </head>
@@ -109,7 +135,8 @@
 			<ul>
 				<li><a href="#">projects</a></li>
 				<li><a href="#">contact</a></li>
-				<li><a href="login.html">login</a></li>
+				<li id="nav-login"><a href="login.html">login</a></li>
+				<li id="nav-logout"><a href="login.html">logout</a></li>
 				<li><img src="./assets/icons/instagram.png" alt="Instagram"></li>
 			</ul>
 		</nav>
@@ -131,7 +158,9 @@
 			</article>
 		</section>
 		<section id="portfolio">
-			<h2>My Projects</h2>
+			<div id="title">
+				<h2>My Projects</h2><i class="fa-regular fa-pen-to-square"></i></span>
+			</div>
 			<div id="filters"></div>
 			<div class="gallery"></div>
 		</section>

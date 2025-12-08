@@ -96,7 +96,7 @@
 			});
 		}
 
-		function loggedIn() {
+		function login() {
 			var token = localStorage.getItem("token");
 			var login = document.getElementById("nav-login");
 			var logout = document.getElementById("nav-logout");
@@ -110,19 +110,14 @@
 				logout.style.display = 'none'
 				login.style.display = 'block';
 			}
-		}
-		function logOut() {
-			var logout = document.getElementById("nav-logout");
 			logout.addEventListener("click", () => {
 				localStorage.setItem("token", "");
 			})
-
 		}
 		document.addEventListener("DOMContentLoaded", () => {
 			getProjects();
 			getFilters();
-			loggedIn();
-			logOut();
+			login();
 		});
 	</script>
 </head>

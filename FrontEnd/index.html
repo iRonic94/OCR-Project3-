@@ -102,16 +102,15 @@
 			var logout = document.getElementById("nav-logout");
 			var filters = document.getElementById("filters");
 			if (token) {
-				login.style.display = 'none';
-				filters.style.display = 'none';
-				logout.style.display = 'block';
-
+				login.classList.add("hide");
+				filters.classList.add("hide");
 			} else {
-				logout.style.display = 'none'
-				login.style.display = 'block';
-			}
+				login.classList.remove("hide");
+				logout.classList.add("hide");
+			} 
 			logout.addEventListener("click", () => {
 				localStorage.setItem("token", "");
+				window.location.href = "login.html";
 			})
 		}
 		document.addEventListener("DOMContentLoaded", () => {
@@ -131,7 +130,7 @@
 				<li><a href="#">projects</a></li>
 				<li><a href="#">contact</a></li>
 				<li id="nav-login"><a href="login.html">login</a></li>
-				<li id="nav-logout"><a href="login.html">logout</a></li>
+				<li id="nav-logout"><a href="#">logout</a></li>
 				<li><img src="./assets/icons/instagram.png" alt="Instagram"></li>
 			</ul>
 		</nav>

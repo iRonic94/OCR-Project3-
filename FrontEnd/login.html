@@ -14,11 +14,9 @@
         <meta name="description" content="">
         <link rel="stylesheet" href="./assets/style.css">
         <script>
-            function executeLogin() {
-                const btnSubmit = document.getElementById("submit");
-                btnSubmit.addEventListener("click", async (event) => {
+                    async function executeLogin(event) {
                     //adding prevent default to prevent refreshing the page when clicking the login 
-                    event.preventDefault();
+                        event.preventDefault();
                     var emailField = document.getElementById('email').value
                     var pass = document.getElementById('password').value
                     try {
@@ -52,14 +50,12 @@
                             status401.style.display = 'none';
                             status404.style.display = 'block';
                         }
+                        return false;
                     } catch (error) {
                         console.error("Failed to connect to the server", error);
+                        return false;
                     }
-                })
-            }
-            document.addEventListener("DOMContentLoaded", () => {
-                executeLogin();
-            });
+                }
         </script>
     </head>
     <header>
@@ -75,8 +71,7 @@
     </header>
     <main>
         <section id="login">
-
-            <form id="login-form" method="post">
+            <form id="login-form" onsubmit="return executeLogin(event)">
                 <label>email:</label>
                 <input type="text" id="email" />
                 <label>PASS:</label>

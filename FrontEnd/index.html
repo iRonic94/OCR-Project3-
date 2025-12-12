@@ -135,11 +135,15 @@
 				window.location.href = "login.html";
 			})
 		}
-		function popupWindow() {
+		function modalSetup() {
 			const modal = document.querySelector(".modal");
 			const overlay = document.querySelector(".overlay");
 			const openModalBtn = document.querySelector(".open");
-			const closeModalBtn = document.querySelector(".btn-close");
+			const closeModalBtn = document.querySelectorAll(".btn-close");
+			const addProjectsBtn = document.querySelector(".btn-add");
+			const backToViewProjectsBtn = document.querySelector(".btn-back");
+			const viewProjectsModal = document.querySelector(".view-modal");
+			const addProjectsModal = document.querySelector(".add-projects-modal");
 			const openModal = function () {
 				modal.classList.remove("hidden");
 				overlay.classList.remove("hidden");
@@ -148,16 +152,27 @@
 				modal.classList.add("hidden");
 				overlay.classList.add("hidden");
 			};
+			const addProjectsView = function () {
+				viewProjectsModal.classList.add("hidden");
+				addProjectsModal.classList.remove("hidden");
+			}
+			const backViewProjects = function () {
+				viewProjectsModal.classList.remove("hidden");
+				addProjectsModal.classList.add("hidden");
+			}
 			openModalBtn.addEventListener("click", openModal);
-			closeModalBtn.addEventListener("click", closeModal);
+			closeModalBtn.forEach(function (btn) {
+				btn.addEventListener("click", closeModal);
+			});
 			overlay.addEventListener("click", closeModal);
-
+			addProjectsBtn.addEventListener("click", addProjectsView);
+			backToViewProjectsBtn.addEventListener("click", backViewProjects);
 		}
 		document.addEventListener("DOMContentLoaded", () => {
 			getProjects();
 			getFilters();
 			login();
-			popupWindow();
+			modalSetup();
 		});
 	</script>
 </head>
@@ -199,15 +214,25 @@
 						class=" fa-regular fa-pen-to-square"></i><span>Edit</span></button>
 			</div>
 			<section class="modal hidden">
-				<div class="modal-content">
-					<div class="close-modal">
+				<div class="view-modal">
+					<div class="btn-top-view">
 						<button class="btn-close">⨉</button>
 					</div>
 					<div class="title-modal">
 						<h2>Photo Gallery</h2>
 					</div>
 					<div class="gallery-modal"></div>
-					<button class="btn">Submit</button>
+					<hr>
+					<button class="btn-add">Add a photo</button>
+				</div>
+				<div class="add-projects-modal hidden">
+					<div class="btn-top-add">
+						<button class="btn-back"><i class="fa-solid fa-arrow-left"></i></button>
+						<button class="btn-close">⨉</button>
+					</div>
+					<div class="title-modal">
+						<h2>Add photo</h2>
+					</div>
 				</div>
 			</section>
 			<div class="overlay hidden"></div>

@@ -9,18 +9,20 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Work+Sans&display=swap"
 		rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 	<meta name="description" content="">
 	<link rel="stylesheet" href="./assets/style.css">
 	<script>
 		var allWorks = [];
 		var activeFilterId = 'all';
-
+		var activeProjects = [];
 		async function getProjects() {
 			const url = "http://localhost:5678/api/works";
 			const response = await fetch(url);
 			const works = await response.json();
 			allWorks = works;
 			renderGallery(allWorks);
+			renderGalleryModal(allWorks);
 		}
 		function renderGallery(works) {
 			const gallery = document.querySelector(".gallery");
@@ -37,9 +39,26 @@
 				figure.appendChild(img);
 				figure.appendChild(figcaption);
 				activeProjects.push(figure);
-				console.log(activeProjects);
 			});
 			gallery.replaceChildren(...activeProjects);
+		}
+		function renderGalleryModal(worksModal) {
+			const galleryModal = document.querySelector(".gallery-modal");
+			activeProjects = [];
+			worksModal.forEach(work => {
+				const figure = document.createElement("figure");
+				const img = document.createElement("img");
+				img.src = work.imageUrl;
+				const button = document.createElement("button");
+				button.setAttribute("class", "btn-icon")
+				const icon = document.createElement("i");
+				icon.setAttribute("class", "fa-regular fa-trash-can");
+				button.appendChild(icon);
+				figure.appendChild(img);
+				figure.appendChild(button);
+				activeProjects.push(figure);
+			});
+			galleryModal.replaceChildren(...activeProjects);
 		}
 		async function getFilters() {
 			const url = "http://localhost:5678/api/categories";
@@ -101,22 +120,44 @@
 			var login = document.getElementById("nav-login");
 			var logout = document.getElementById("nav-logout");
 			var filters = document.getElementById("filters");
+			var edit = document.getElementById("edit-projects");
 			if (token) {
-				login.classList.add("hide");
-				filters.classList.add("hide");
+				login.classList.add("hidden");
+				filters.classList.add("hidden");
 			} else {
-				login.classList.remove("hide");
-				logout.classList.add("hide");
-			} 
+				login.classList.remove("hidden");
+				logout.classList.add("hidden");
+				edit.classList.add("hidden");
+			}
+
 			logout.addEventListener("click", () => {
 				localStorage.setItem("token", "");
 				window.location.href = "login.html";
 			})
 		}
+		function popupWindow() {
+			const modal = document.querySelector(".modal");
+			const overlay = document.querySelector(".overlay");
+			const openModalBtn = document.querySelector(".open");
+			const closeModalBtn = document.querySelector(".btn-close");
+			const openModal = function () {
+				modal.classList.remove("hidden");
+				overlay.classList.remove("hidden");
+			};
+			const closeModal = function () {
+				modal.classList.add("hidden");
+				overlay.classList.add("hidden");
+			};
+			openModalBtn.addEventListener("click", openModal);
+			closeModalBtn.addEventListener("click", closeModal);
+			overlay.addEventListener("click", closeModal);
+
+		}
 		document.addEventListener("DOMContentLoaded", () => {
 			getProjects();
 			getFilters();
 			login();
+			popupWindow();
 		});
 	</script>
 </head>
@@ -153,8 +194,23 @@
 		</section>
 		<section id="portfolio">
 			<div id="title">
-				<h2>My Projects</h2><i class="fa-regular fa-pen-to-square"></i></span>
+				<h2>My Projects</h2>
+				<button class="open" id="edit-projects"><i
+						class=" fa-regular fa-pen-to-square"></i><span>Edit</span></button>
 			</div>
+			<section class="modal hidden">
+				<div class="modal-content">
+					<div class="close-modal">
+						<button class="btn-close">⨉</button>
+					</div>
+					<div class="title-modal">
+						<h2>Photo Gallery</h2>
+					</div>
+					<div class="gallery-modal"></div>
+					<button class="btn">Submit</button>
+				</div>
+			</section>
+			<div class="overlay hidden"></div>
 			<div id="filters"></div>
 			<div class="gallery"></div>
 		</section>

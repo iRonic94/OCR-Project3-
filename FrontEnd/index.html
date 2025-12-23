@@ -48,7 +48,7 @@
 			worksModal.forEach(work => {
 				const figure = document.createElement("figure");
 				const img = document.createElement("img");
-				console.log(work)
+				//console.log(work)
 				img.src = work.imageUrl;
 				const button = document.createElement("button");
 				button.setAttribute("class", "btn-icon")
@@ -70,18 +70,23 @@
 				}
 				const categories = await response.json();
 				const filtersContainer = document.getElementById("filters");
+				const selection = document.getElementById("category-selection");
 
 				const allBtn = document.createElement("button");
 				allBtn.textContent = "All";
 				allBtn.classList.add("btn-filter", "active");
 				allBtn.setAttribute("id", "all");
 				filtersContainer.appendChild(allBtn);
+
 				categories.forEach(category => {
 					const button = document.createElement("button");
+					const options = document.createElement("option");
 					button.textContent = category.name;
+					options.textContent = category.name;
 					button.setAttribute("class", "btn-filter");
 					button.setAttribute("id", category.id);
 					filtersContainer.appendChild(button);
+					selection.appendChild(options);
 				})
 
 			} catch (error) {
@@ -110,7 +115,7 @@
 						filteredProjects = allWorks.filter(work => work.categoryId === Number(activeFilterId));
 						console.log("allWorks:", allWorks)
 					}
-					console.log("filtered projects: ", filteredProjects)
+					// console.log("filtered projects: ", filteredProjects)
 					renderGallery(filteredProjects);
 				});
 			});
@@ -170,21 +175,62 @@
 			backToViewProjectsBtn.addEventListener("click", backViewProjects);
 		}
 		function uploadImgSetup() {
+			const input = document.querySelector("input");
 			const preview = document.querySelector(".preview-upload");
-			input.addEventListener("change", updateImageDisplay);
+			const beforePreview = document.querySelector(".before-upload");
+			const btnConfirm = document.querySelector(".btn-confirm");
+			if (input.files.length == 0) {
+				beforePreview.classList.remove("hidden");
+				preview.classList.add("hidden");
+				btnConfirm.classList.add("btn-disable");
+			}
 			function updateImageDisplay() {
 				while (preview.firstChild) {
 					preview.removeChild(preview.firstChild);
 				}
+				const currentFile = input.files[0];
+
+				console.log("in else condition:", currentFile)
+				const img = document.createElement("img");
+				img.src = URL.createObjectURL(currentFile);
+				img.alt = currentFile.name;
+				img.setAttribute("height", "200px")
+				img.setAttribute("id", "upImg");
+				preview.appendChild(img);
+				beforePreview.classList.add("hidden");
+				preview.classList.remove("hidden");
+				btnConfirm.classList.remove("btn-disable");
 
 			}
+			const btnAddProject = async function () {
+				const uploadTitleImg = document.getElementById("upload-title").value;
+				const uploadCategoryImg = document.getElementById("category-selection").value;
+				const srcImg = document.getElementById("upImg").src;
+				const token = localStorage.getItem("token");
 
+				var response = await fetch("http://localhost:5678/api/works", {
+					method: "POST",
+					headers: {
+						"Authorization": "Bearer " + token
+					},
+					body: JSON.stringify({
+						id: 0,
+						title: uploadTitleImg,
+						imageUrl: srcImg,
+						categoryId: uploadCategoryImg,
+						userId: 1
+					})
+				});
+			}
+			btnConfirm.addEventListener("click", btnAddProject);
+			input.addEventListener("change", updateImageDisplay);
 		}
 		document.addEventListener("DOMContentLoaded", () => {
 			getProjects();
 			getFilters();
 			loginSetup();
 			modalSetup();
+			uploadImgSetup();
 		});
 	</script>
 </head>
@@ -252,20 +298,23 @@
 								photo</label>
 							<input type="file" id="image_uploads" name="image_uploads" accept=".jpg, .jpeg, .png"
 								class="hidden" />
-							<span>jpg, png: max 4 MB</span>
 							<div class="error-size"></div>
+							<span>jpg, png: max 4 MB</span>
 						</div>
 						<div class="preview-upload"></div>
 					</div>
 					<div class="fields">
 						<form>
 							<label for="title">Title</label>
-							<input type="text" name="title" id="title">
+							<input type="text" name="title" id="upload-title">
 							<label for="category-selection">Category</label>
-							<select name="category" id="category-selection"></select>
+							<select name="category" id="category-selection">
+								<option></option>
+							</select>
 							<hr>
 						</form>
 					</div>
+					<div class="error-size hidden">Please check the size of the image</div>
 					<button class="btn-confirm">Confirm</button>
 				</div>
 			</section>

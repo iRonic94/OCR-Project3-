@@ -398,7 +398,8 @@ button {
 	bottom: 150px;
 }
 
-.btn-close {
+.btn-close,
+.btn-back {
 	background: white;
 	font-size: 1.2rem;
 }
@@ -413,7 +414,17 @@ button {
 	color: white;
 	font-weight: bold;
 	font-size: 15px;
-	font-family: 'Syne';
+}
+
+.btn-disable {
+	width: 200px;
+	height: 40px;
+	border-radius: 20px;
+	align-self: center;
+	background: #A7A7A7;
+	color: white;
+	font-weight: bold;
+	font-size: 15px;
 }
 
 .overlay {
@@ -516,4 +527,9 @@ button {
 	flex-direction: column;
 	gap: 10px;
 
+}
+
+.preview-upload {
+	display: flex;
+	justify-content: center;
 }

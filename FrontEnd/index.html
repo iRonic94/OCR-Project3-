@@ -232,6 +232,8 @@
 					},
 					body: formData
 				});
+				getProjects();
+				modalUI();
 			}
 			function btnDeleteProject() {
 				const selectProject = document.querySelectorAll(".modal-view-projects");
@@ -244,15 +246,14 @@
 								"Authorization": "Bearer " + token
 							}
 						});
-						console.log(btn.id)
+						getProjects();
+						modalUI();
 					});
-
 				});
 			}
 			btnDeleteProject();
 			btnConfirm.addEventListener("click", btnAddProject);
 			input.addEventListener("change", updateImageDisplay);
-
 		}
 		document.addEventListener("DOMContentLoaded", () => {
 			getProjects();

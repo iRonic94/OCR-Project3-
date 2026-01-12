@@ -15,18 +15,20 @@
 	<script>
 		var allWorks = [];
 		var activeFilterId = 'all';
-		var activeProjects = [];
-		async function getProjects() {
+		var activeOverviewProjects = [];
+		var activeModalProjects = [];
+		async function loadProjects() {
 			const url = "http://localhost:5678/api/works";
 			const response = await fetch(url);
 			const works = await response.json();
 			allWorks = works;
 			renderGallery(allWorks);
-			renderGalleryModal(allWorks);
 		}
 		function renderGallery(works) {
 			const gallery = document.querySelector(".gallery");
-			activeProjects = [];
+			const galleryModal = document.querySelector(".gallery-modal");
+
+			activeOverviewProjects = [];
 			works.forEach(work => {
 				const figure = document.createElement("figure");
 				const img = document.createElement("img");
@@ -38,14 +40,11 @@
 
 				figure.appendChild(img);
 				figure.appendChild(figcaption);
-				activeProjects.push(figure);
+				activeOverviewProjects.push(figure);
 			});
-			gallery.replaceChildren(...activeProjects);
-		}
-		function renderGalleryModal(worksModal) {
-			const galleryModal = document.querySelector(".gallery-modal");
-			activeProjects = [];
-			worksModal.forEach(work => {
+
+			activeModalProjects = [];
+			works.forEach(work => {
 				const divProjects = document.createElement("div");
 				const figure = document.createElement("figure");
 				const img = document.createElement("img");
@@ -63,9 +62,10 @@
 				divProjects.appendChild(figure);
 				figure.appendChild(img);
 				figure.appendChild(button);
-				activeProjects.push(divProjects);
+				activeModalProjects.push(divProjects);
 			});
-			galleryModal.replaceChildren(...activeProjects);
+			gallery.replaceChildren(...activeOverviewProjects);
+			galleryModal.replaceChildren(...activeModalProjects);
 		}
 		async function getFilters() {
 			const url = "http://localhost:5678/api/categories";
@@ -107,9 +107,8 @@
 			buttons.forEach(btn => {
 				btn.addEventListener("click", () => {
 					let activeBtn = document.getElementById(activeFilterId)
-					console.log(activeBtn);
 					//remove active class
-					activeBtn.classList.remove("active");
+					buttons.forEach(b => b.classList.remove("active"));
 					//add active class
 					btn.classList.add("active");
 					//update active id
@@ -120,9 +119,7 @@
 					} else {
 						//filter projects based on category selection
 						filteredProjects = allWorks.filter(work => work.categoryId === Number(activeFilterId));
-						console.log("allWorks:", allWorks)
 					}
-					// console.log("filtered projects: ", filteredProjects)
 					renderGallery(filteredProjects);
 				});
 			});
@@ -232,7 +229,7 @@
 					},
 					body: formData
 				});
-				getProjects();
+				loadProjects();
 				modalUI();
 			}
 			function btnDeleteProject() {
@@ -246,7 +243,7 @@
 								"Authorization": "Bearer " + token
 							}
 						});
-						getProjects();
+						loadProjects();
 						modalUI();
 					});
 				});
@@ -256,11 +253,10 @@
 			input.addEventListener("change", updateImageDisplay);
 		}
 		document.addEventListener("DOMContentLoaded", () => {
-			getProjects();
+			loadProjects();
 			getFilters();
 			loginSetup();
 			modalUI();
-			//modalDeleteAddProject();
 		});
 	</script>
 </head>

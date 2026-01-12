@@ -17,8 +17,8 @@
             async function executeLogin(event) {
                 //adding prevent default to prevent refreshing the page when clicking the login 
                 event.preventDefault();
-                var emailField = document.getElementById('email').value
-                var pass = document.getElementById('password').value
+                var emailField = document.getElementById('email-login').value
+                var pass = document.getElementById('password-login').value
                 try {
                     var response = await fetch("http://localhost:5678/api/users/login", {
                         method: "POST",
@@ -75,20 +75,19 @@
                 <h2>Login</h2>
                 <span id="email-section">
                     <label>Email</label>
-                    <input type="text" id="email" />
+                    <input type="text" id="email-login" />
                 </span>
                 <span id="password-section">
                     <label>Password</label>
-                    <input type="password" id="password" />
+                    <input type="password" id="password-login" />
                 </span>
                 <button type="submit" value="login" id="submit">Sign in</button>
+                <div id="status-401" style="display:none"><span>Not Authorized!</span></div>
+                <div id="status-404" style="display:none"><span>User not found!</span></div>
                 <span id="forgot-password">
                     <button id="forgot-psw"><u>Forgot your password?</u></button>
                 </span>
             </form>
-            <!-- <div id="status-200" style="display:none"><span>Login successfully!</span></div> -->
-            <div id="status-401" style="display:none"><span>Not Authorized!</span></div>
-            <div id="status-404" style="display:none"><span>User not found!</span></div>
         </section>
     </main>
 

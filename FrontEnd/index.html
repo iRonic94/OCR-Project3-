@@ -255,39 +255,43 @@
 				viewModal.classList.remove("hidden");
 				uploadTitleImg.value = "";
 				uploadCategoryImg.value = "";
-				loadProjects();
 			}
-			// const btnDeleteProject = async () => {
-			// 	const galleryModal = document.querySelector(".gallery-modal");
-			// 	const token = localStorage.getItem("token");
-			// 	const status200 = document.getElementById("status-200");
-			// 	const status401 = document.getElementById("status-401");
+			const btnDeleteProject = async () => {
+				const galleryModal = document.querySelector(".gallery-modal");
+				const token = localStorage.getItem("token");
+				const status200 = document.getElementById("status-200");
+				const status401 = document.getElementById("status-401");
 
-			// 	if (!deleteBtn) return;
-			// 	galleryModal.addEventListener("click", async (event) => {
-			// 		const deleteBtn = event.target.closest(".btn-delete");
-			// 		const projectDiv = deleteBtn.closest(".modal-view-projects");
-			// 		const workId = projectDiv.id;
-			// 		var response = await fetch("http://localhost:5678/api/works/" + workId, {
-			// 			method: "DELETE",
-			// 			headers: {
-			// 				"Authorization": "Bearer " + token
-			// 			}
-			// 		});
-			// 		if (response.status == 200) {
-			// 			status200.classList.remove("hidden");
-			// 		} else if (response.status == 401) {
-			// 			status200.classList.add("hidden");
-			// 			status401.classList.remove("hidden");
-			// 		} else {
-			// 			status200.classList.add("hidden");
-			// 			status401.classList.add("hidden");
-			// 		}
-			// 	});
-			// }
+				galleryModal.addEventListener("click", async (event) => {
+					const deleteBtn = event.target.closest(".btn-delete");
+					if (!deleteBtn) return;
+
+					const projectDiv = deleteBtn.closest(".modal-view-projects");
+					if (!projectDiv) return;
+
+					const workId = projectDiv.id;
+
+					const response = await fetch("http://localhost:5678/api/works/" + workId, {
+						method: "DELETE",
+						headers: {
+							"Authorization": "Bearer " + token
+						}
+					});
+					if (response.ok) {
+						status200.classList.remove("hidden");
+						projectDiv.remove();
+					} else if (response.status == 401) {
+						status200.classList.add("hidden");
+						status401.classList.remove("hidden");
+					} else {
+						status200.classList.add("hidden");
+						status401.classList.add("hidden");
+					}
+				});
+
+			}
 			btnConfirm.addEventListener("click", btnAddProject);
-			// btnDelete.addEventListener("click", btnDeleteProject);
-			//btnDeleteProject();
+			btnDeleteProject();
 			input.addEventListener("change", updateImageDisplay);
 		}
 		document.addEventListener("DOMContentLoaded", () => {

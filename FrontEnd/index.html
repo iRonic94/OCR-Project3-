@@ -22,50 +22,52 @@
 			const response = await fetch(url);
 			const works = await response.json();
 			allWorks = works;
-			renderGallery(allWorks);
+			renderGallery(allWorks, "both");
 		}
-		function renderGallery(works) {
+		function renderGallery(works, target = "both") {
 			const gallery = document.querySelector(".gallery");
 			const galleryModal = document.querySelector(".gallery-modal");
+			if (target == "both" || target == "main") {
+				activeOverviewProjects = [];
+				works.forEach(work => {
+					const figure = document.createElement("figure");
+					const img = document.createElement("img");
+					img.src = work.imageUrl;
+					img.alt = work.title;
 
-			activeOverviewProjects = [];
-			works.forEach(work => {
-				const figure = document.createElement("figure");
-				const img = document.createElement("img");
-				img.src = work.imageUrl;
-				img.alt = work.title;
+					const figcaption = document.createElement("figcaption");
+					figcaption.textContent = work.title;
 
-				const figcaption = document.createElement("figcaption");
-				figcaption.textContent = work.title;
+					figure.appendChild(img);
+					figure.appendChild(figcaption);
+					activeOverviewProjects.push(figure);
+				});
+				gallery.replaceChildren(...activeOverviewProjects);
+			}
+			if (target == "both" || target == "modal") {
+				activeModalProjects = [];
+				works.forEach(work => {
+					const divProjects = document.createElement("div");
+					const figure = document.createElement("figure");
+					const img = document.createElement("img");
+					img.src = work.imageUrl;
 
-				figure.appendChild(img);
-				figure.appendChild(figcaption);
-				activeOverviewProjects.push(figure);
-			});
+					const button = document.createElement("button");
+					button.setAttribute("class", "btn-delete");
 
-			activeModalProjects = [];
-			works.forEach(work => {
-				const divProjects = document.createElement("div");
-				const figure = document.createElement("figure");
-				const img = document.createElement("img");
-				img.src = work.imageUrl;
+					const deleteBtn = document.createElement("i");
+					deleteBtn.setAttribute("class", "fa-regular fa-trash-can");
+					divProjects.setAttribute("class", "modal-view-projects");
+					divProjects.setAttribute("id", work.id);
 
-				const button = document.createElement("button");
-				button.setAttribute("class", "btn-delete");
-
-				const deleteBtn = document.createElement("i");
-				deleteBtn.setAttribute("class", "fa-regular fa-trash-can");
-				divProjects.setAttribute("class", "modal-view-projects");
-				divProjects.setAttribute("id", work.id);
-
-				button.appendChild(deleteBtn);
-				divProjects.appendChild(figure);
-				figure.appendChild(img);
-				figure.appendChild(button);
-				activeModalProjects.push(divProjects);
-			});
-			gallery.replaceChildren(...activeOverviewProjects);
-			galleryModal.replaceChildren(...activeModalProjects);
+					button.appendChild(deleteBtn);
+					divProjects.appendChild(figure);
+					figure.appendChild(img);
+					figure.appendChild(button);
+					activeModalProjects.push(divProjects);
+				});
+				galleryModal.replaceChildren(...activeModalProjects);
+			}
 		}
 		async function getFilters() {
 			const url = "http://localhost:5678/api/categories";
@@ -124,7 +126,7 @@
 					const catId = Number(extractId[1])
 					filteredProjects = allWorks.filter(work => work.categoryId === catId);
 				}
-				renderGallery(filteredProjects);
+				renderGallery(filteredProjects, "both");
 			});
 		}
 
@@ -165,6 +167,7 @@
 			const closeModal = function () {
 				modal.classList.add("hidden");
 				overlay.classList.add("hidden");
+				renderGallery(allWorks, "both");
 			};
 			const addProjectsView = function () {
 				viewProjectsModal.classList.add("hidden");
@@ -198,9 +201,7 @@
 				btnConfirm.disabled = true;
 			}
 			function updateImageDisplay() {
-				while (preview.firstChild) {
-					preview.removeChild(preview.firstChild);
-				}
+				preview.replaceChildren();
 				const currentFile = input.files[0];
 				const img = document.createElement("img");
 				img.src = URL.createObjectURL(currentFile);
@@ -234,12 +235,6 @@
 				formData.append("title", titleImgInput);
 				formData.append("category", categoryImgInput);
 
-				if ((titleImgInput == "") || (categoryImgInput == "")) {
-					status400.classList.remove("hidden");
-					return;
-				} else {
-					status400.classList.add("hidden");
-				}
 				console.log(formData);
 				var response = await fetch("http://localhost:5678/api/works", {
 					method: "POST",
@@ -248,15 +243,22 @@
 					},
 					body: formData
 				});
-
-				addModal.classList.add("hidden");
-				previewUpload.classList.add("hidden");
-				beforeUpload.classList.remove("hidden");
-				viewModal.classList.remove("hidden");
+				const newWork = await response.json();
+				allWorks.push(newWork);
+				if (response.ok) {
+					renderGallery(allWorks, "modal");
+					addModal.classList.add("hidden");
+					previewUpload.classList.add("hidden");
+					beforeUpload.classList.remove("hidden");
+					viewModal.classList.remove("hidden");
+				} else {
+					status400.classList.remove("hidden");
+					return;
+				}
 				uploadTitleImg.value = "";
 				uploadCategoryImg.value = "";
 			}
-			const btnDeleteProject = async () => {
+			function btnDeleteProject() {
 				const galleryModal = document.querySelector(".gallery-modal");
 				const token = localStorage.getItem("token");
 				const status200 = document.getElementById("status-200");
@@ -280,6 +282,8 @@
 					if (response.ok) {
 						status200.classList.remove("hidden");
 						projectDiv.remove();
+						const deletedId = Number(workId);
+						allWorks = allWorks.filter(work => work.id !== deletedId);
 					} else if (response.status == 401) {
 						status200.classList.add("hidden");
 						status401.classList.remove("hidden");
@@ -348,7 +352,7 @@
 						<h2>Photo Gallery</h2>
 					</div>
 					<div class="gallery-modal"></div>
-					<div id="status-200" class="hidden">You must fill both fields!</div>
+					<div id="status-200" class="hidden">Item deleted!</div>
 					<div id="status-401" class="hidden">You don't have access!</div>
 					<div id="status-500" class="hidden">Unexpected Behaviour</div>
 					<hr>

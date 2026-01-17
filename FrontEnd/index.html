@@ -159,7 +159,7 @@
 			const backToViewProjectsBtn = document.querySelector(".btn-back");
 			const viewProjectsModal = document.querySelector(".view-modal");
 			const addProjectsModal = document.querySelector(".add-projects-modal");
-			const edit = document.getElementById("edit-projects");
+
 			const openModal = function () {
 				modal.classList.remove("hidden");
 				overlay.classList.remove("hidden");
@@ -184,7 +184,6 @@
 			overlay.addEventListener("click", closeModal);
 			addProjectsBtn.addEventListener("click", addProjectsView);
 			backToViewProjectsBtn.addEventListener("click", backViewProjects);
-			edit.addEventListener("click", modalDeleteAddProject)
 
 		}
 		function modalDeleteAddProject() {
@@ -300,6 +299,7 @@
 		}
 		document.addEventListener("DOMContentLoaded", () => {
 			loadProjects();
+			modalDeleteAddProject();
 			getFilters();
 			loginSetup();
 			modalUI();

@@ -214,20 +214,27 @@
 				btnConfirm.disabled = false;
 			}
 			const btnAddProject = async () => {
-				const uploadTitleImg = document.getElementById("upload-title").value;
-				const uploadCategoryImg = document.getElementById("category-selection").value;
+				const uploadTitleImg = document.getElementById("upload-title");
+				const uploadCategoryImg = document.getElementById("category-selection");
+				const addModal = document.querySelector(".add-projects-modal");
+				const viewModal = document.querySelector(".view-modal");
+				const beforeUpload = document.querySelector(".before-upload");
+				const previewUpload = document.querySelector(".preview-upload");
 				const token = localStorage.getItem("token");
 				const fileInput = document.getElementById("image_uploads");
 				const status400 = document.getElementById("status-400");
 				const status401 = document.getElementById("status-401");
 
+				let titleImgInput = uploadTitleImg.value;
+				let categoryImgInput = uploadCategoryImg.value;
+
 				const file = fileInput.files[0];
 				const formData = new FormData();
 				formData.append("image", file);
-				formData.append("title", uploadTitleImg);
-				formData.append("category", uploadCategoryImg);
+				formData.append("title", titleImgInput);
+				formData.append("category", categoryImgInput);
 
-				if ((uploadTitleImg == "") || (uploadCategoryImg == "")) {
+				if ((titleImgInput == "") || (categoryImgInput == "")) {
 					status400.classList.remove("hidden");
 					return;
 				} else {
@@ -241,8 +248,14 @@
 					},
 					body: formData
 				});
+
+				addModal.classList.add("hidden");
+				previewUpload.classList.add("hidden");
+				beforeUpload.classList.remove("hidden");
+				viewModal.classList.remove("hidden");
+				uploadTitleImg.value = "";
+				uploadCategoryImg.value = "";
 				loadProjects();
-				modalUI();
 			}
 			// const btnDeleteProject = async () => {
 			// 	const galleryModal = document.querySelector(".gallery-modal");
@@ -274,7 +287,7 @@
 			// }
 			btnConfirm.addEventListener("click", btnAddProject);
 			// btnDelete.addEventListener("click", btnDeleteProject);
-			btnDeleteProject();
+			//btnDeleteProject();
 			input.addEventListener("change", updateImageDisplay);
 		}
 		document.addEventListener("DOMContentLoaded", () => {

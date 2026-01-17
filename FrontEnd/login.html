@@ -32,7 +32,6 @@
                         })
                     });
                     //checking the statuses
-                    var status200 = document.getElementById("status-200");
                     var status404 = document.getElementById("status-401");
                     var status401 = document.getElementById("status-404");
                     //resetting token when is not logged in
@@ -44,11 +43,11 @@
                         //redirect to the index
                         window.location.href = "index.html";
                     } else if (response.status == 401) {
-                        status401.style.display = 'block';
-                        status404.style.display = 'none';
+                        status404.classList.add("hidden");
+                        status401.classList.remove("hidden");
                     } else if (response.status == 404) {
-                        status401.style.display = 'none';
-                        status404.style.display = 'block';
+                        status401.classList.add("hidden");
+                        status404.classList.remove("hidden");
                     }
                     return false;
                 } catch (error) {
@@ -82,8 +81,8 @@
                     <input type="password" id="password-login" />
                 </span>
                 <button type="submit" value="login" id="submit">Sign in</button>
-                <div id="status-401" style="display:none"><span>Not Authorized!</span></div>
-                <div id="status-404" style="display:none"><span>User not found!</span></div>
+                <div id="status-401" class="hidden"><span>Not Authorized!</span></div>
+                <div id="status-404" class="hidden"><span>User not found!</span></div>
                 <span id="forgot-password">
                     <button id="forgot-psw"><u>Forgot your password?</u></button>
                 </span>

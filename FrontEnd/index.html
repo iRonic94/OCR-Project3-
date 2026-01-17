@@ -90,7 +90,7 @@
 					button.textContent = category.name;
 					options.textContent = category.name;
 					button.setAttribute("class", "btn-filter");
-					button.setAttribute("id", category.id);
+					button.setAttribute("id", "filter-" + category.id);
 					options.setAttribute("value", category.id);
 					filtersContainer.appendChild(button);
 					selection.appendChild(options);
@@ -102,26 +102,29 @@
 			setFilters();
 		}
 		function setFilters() {
-			const buttons = document.querySelectorAll(".btn-filter");
+			const buttons = document.querySelector("#filters");
 
-			buttons.forEach(btn => {
-				btn.addEventListener("click", () => {
-					let activeBtn = document.getElementById(activeFilterId)
-					//remove active class
-					buttons.forEach(b => b.classList.remove("active"));
-					//add active class
-					btn.classList.add("active");
-					//update active id
-					activeFilterId = btn.id;
-					//check all to show all projects
-					if (activeFilterId === "all") {
-						var filteredProjects = allWorks;
-					} else {
-						//filter projects based on category selection
-						filteredProjects = allWorks.filter(work => work.categoryId === Number(activeFilterId));
-					}
-					renderGallery(filteredProjects);
-				});
+			buttons.addEventListener("click", (event) => {
+				const btnClicked = event.target.closest(".btn-filter");
+				if (!btnClicked) return; //to be sure that is not clicking outside of the scope
+				const activeBtn = document.getElementById(activeFilterId);
+				console.log("activeFilterId before:" + activeFilterId);
+				//remove active class
+				if (activeBtn) activeBtn.classList.remove("active");
+				//add active class
+				btnClicked.classList.add("active");
+				//update active id
+				activeFilterId = btnClicked.id;
+				//check all to show all projects
+				if (activeFilterId === "all") {
+					var filteredProjects = allWorks;
+				} else {
+					//filter projects based on category selection
+					const extractId = activeFilterId.split("-");
+					const catId = Number(extractId[1])
+					filteredProjects = allWorks.filter(work => work.categoryId === catId);
+				}
+				renderGallery(filteredProjects);
 			});
 		}
 
@@ -192,13 +195,13 @@
 				beforePreview.classList.remove("hidden");
 				preview.classList.add("hidden");
 				btnConfirm.classList.add("btn-disable");
+				btnConfirm.disabled = true;
 			}
 			function updateImageDisplay() {
 				while (preview.firstChild) {
 					preview.removeChild(preview.firstChild);
 				}
 				const currentFile = input.files[0];
-
 				const img = document.createElement("img");
 				img.src = URL.createObjectURL(currentFile);
 				img.alt = currentFile.name;
@@ -208,19 +211,28 @@
 				beforePreview.classList.add("hidden");
 				preview.classList.remove("hidden");
 				btnConfirm.classList.remove("btn-disable");
-
+				btnConfirm.disabled = false;
 			}
-			const btnAddProject = async function () {
+			const btnAddProject = async () => {
 				const uploadTitleImg = document.getElementById("upload-title").value;
 				const uploadCategoryImg = document.getElementById("category-selection").value;
 				const token = localStorage.getItem("token");
-				const fileInput = document.getElementById("image_uploads")
+				const fileInput = document.getElementById("image_uploads");
+				const status400 = document.getElementById("status-400");
+				const status401 = document.getElementById("status-401");
+
 				const file = fileInput.files[0];
-				console.log(uploadCategoryImg)
 				const formData = new FormData();
 				formData.append("image", file);
 				formData.append("title", uploadTitleImg);
 				formData.append("category", uploadCategoryImg);
+
+				if ((uploadTitleImg == "") || (uploadCategoryImg == "")) {
+					status400.classList.remove("hidden");
+					return;
+				} else {
+					status400.classList.add("hidden");
+				}
 				console.log(formData);
 				var response = await fetch("http://localhost:5678/api/works", {
 					method: "POST",
@@ -232,24 +244,37 @@
 				loadProjects();
 				modalUI();
 			}
-			function btnDeleteProject() {
-				const selectProject = document.querySelectorAll(".modal-view-projects");
-				const token = localStorage.getItem("token");
-				selectProject.forEach(btn => {
-					btn.addEventListener("click", async () => {
-						var response = await fetch("http://localhost:5678/api/works/" + btn.id, {
-							method: "DELETE",
-							headers: {
-								"Authorization": "Bearer " + token
-							}
-						});
-						loadProjects();
-						modalUI();
-					});
-				});
-			}
-			btnDeleteProject();
+			// const btnDeleteProject = async () => {
+			// 	const galleryModal = document.querySelector(".gallery-modal");
+			// 	const token = localStorage.getItem("token");
+			// 	const status200 = document.getElementById("status-200");
+			// 	const status401 = document.getElementById("status-401");
+
+			// 	if (!deleteBtn) return;
+			// 	galleryModal.addEventListener("click", async (event) => {
+			// 		const deleteBtn = event.target.closest(".btn-delete");
+			// 		const projectDiv = deleteBtn.closest(".modal-view-projects");
+			// 		const workId = projectDiv.id;
+			// 		var response = await fetch("http://localhost:5678/api/works/" + workId, {
+			// 			method: "DELETE",
+			// 			headers: {
+			// 				"Authorization": "Bearer " + token
+			// 			}
+			// 		});
+			// 		if (response.status == 200) {
+			// 			status200.classList.remove("hidden");
+			// 		} else if (response.status == 401) {
+			// 			status200.classList.add("hidden");
+			// 			status401.classList.remove("hidden");
+			// 		} else {
+			// 			status200.classList.add("hidden");
+			// 			status401.classList.add("hidden");
+			// 		}
+			// 	});
+			// }
 			btnConfirm.addEventListener("click", btnAddProject);
+			// btnDelete.addEventListener("click", btnDeleteProject);
+			btnDeleteProject();
 			input.addEventListener("change", updateImageDisplay);
 		}
 		document.addEventListener("DOMContentLoaded", () => {
@@ -306,6 +331,9 @@
 						<h2>Photo Gallery</h2>
 					</div>
 					<div class="gallery-modal"></div>
+					<div id="status-200" class="hidden">You must fill both fields!</div>
+					<div id="status-401" class="hidden">You don't have access!</div>
+					<div id="status-500" class="hidden">Unexpected Behaviour</div>
 					<hr>
 					<button class="btn-add">Add a photo</button>
 				</div>
@@ -341,6 +369,9 @@
 						</form>
 					</div>
 					<div class="error-size hidden">Please check the size of the image</div>
+					<div id="status-400" class="hidden">You must fill both fields!</div>
+					<div id="status-401" class="hidden">You don't have access!</div>
+					<div id="status-500" class="hidden">Unexpected Behaviour</div>
 					<button class="btn-confirm">Confirm</button>
 				</div>
 			</section>

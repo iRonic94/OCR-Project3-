@@ -282,9 +282,12 @@
 					previewUpload.classList.add("hidden");
 					beforeUpload.classList.remove("hidden");
 					viewModal.classList.remove("hidden");
-				} else {
-					status400.classList.remove("hidden");
+				} else if (response.status == 401) {
+					status401.classList.remove("hidden");
 					return;
+				} else if (response.status == 400) {
+					status401.classList.add("hidden");
+					status400.classList.remove("hidden");
 				}
 				uploadTitleImg.value = "";
 				uploadCategoryImg.value = "";
@@ -415,13 +418,13 @@
 							<select name="category" id="category-selection">
 								<option></option>
 							</select>
-							<hr>
 						</form>
 					</div>
 					<div id="error-size" class="hidden">Please check the size of the image</div>
 					<div id="status-400-modal-add" class="hidden">You must fill both fields!</div>
 					<div id="status-401-modal-add" class="hidden">You don't have access!</div>
 					<div id="status-500-modal-add" class="hidden">Unexpected Behaviour</div>
+					<hr>
 					<button class="btn-confirm">Confirm</button>
 				</div>
 			</section>

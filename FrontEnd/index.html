@@ -160,11 +160,23 @@
 			const viewProjectsModal = document.querySelector(".view-modal");
 			const addProjectsModal = document.querySelector(".add-projects-modal");
 
+			function resetStatuses() {
+				document.getElementById("status-400-modal-add").classList.add("hidden");
+				document.getElementById("status-401-modal-add").classList.add("hidden");
+				document.getElementById("status-500-modal-add").classList.add("hidden");
+				document.getElementById("status-200-modal-delete").classList.add("hidden");
+				document.getElementById("status-401-modal-delete").classList.add("hidden");
+				document.getElementById("status-500-modal-delete").classList.add("hidden");
+				document.getElementById("error-size").classList.add("hidden");
+			}
+
 			const openModal = function () {
+				//resetStatuses();
 				modal.classList.remove("hidden");
 				overlay.classList.remove("hidden");
 			};
 			const closeModal = function () {
+				resetStatuses();
 				modal.classList.add("hidden");
 				overlay.classList.add("hidden");
 				renderGallery(allWorks, "both");
@@ -174,6 +186,7 @@
 				addProjectsModal.classList.remove("hidden");
 			}
 			const backViewProjects = function () {
+				resetStatuses();
 				viewProjectsModal.classList.remove("hidden");
 				addProjectsModal.classList.add("hidden");
 			}
@@ -222,19 +235,38 @@
 				const previewUpload = document.querySelector(".preview-upload");
 				const token = localStorage.getItem("token");
 				const fileInput = document.getElementById("image_uploads");
-				const status400 = document.getElementById("status-400");
-				const status401 = document.getElementById("status-401");
+				const status400 = document.getElementById("status-400-modal-add");
+				const status401 = document.getElementById("status-401-modal-add");
+				const status500 = document.getElementById("status-500-modal-add");
+				const errorSize = document.getElementById("error-size");
 
 				let titleImgInput = uploadTitleImg.value;
 				let categoryImgInput = uploadCategoryImg.value;
 
 				const file = fileInput.files[0];
 				const formData = new FormData();
+				const maxSize = 4 * 1024 * 1024//4mb
 				formData.append("image", file);
 				formData.append("title", titleImgInput);
 				formData.append("category", categoryImgInput);
-
-				console.log(formData);
+				if (!(file.type == "image/jpeg" || file.type == "image/jpg" || file.type == "image/png")) {
+					previewUpload.classList.add("hidden");
+					beforeUpload.classList.remove("hidden");
+					status500.classList.remove("hidden");
+					uploadTitleImg.value = "";
+					uploadCategoryImg.value = "";
+					fileInput.value = "";
+					return;
+				}
+				if (file.size > maxSize) {
+					previewUpload.classList.add("hidden");
+					beforeUpload.classList.remove("hidden");
+					errorSize.classList.remove("hidden");
+					uploadTitleImg.value = "";
+					uploadCategoryImg.value = "";
+					fileInput.value = "";
+					return;
+				}
 				var response = await fetch("http://localhost:5678/api/works", {
 					method: "POST",
 					headers: {
@@ -256,12 +288,14 @@
 				}
 				uploadTitleImg.value = "";
 				uploadCategoryImg.value = "";
+				fileInput.value = "";
 			}
 			function btnDeleteProject() {
 				const galleryModal = document.querySelector(".gallery-modal");
 				const token = localStorage.getItem("token");
-				const status200 = document.getElementById("status-200");
-				const status401 = document.getElementById("status-401");
+				const status200 = document.getElementById("status-200-modal-delete");
+				const status401 = document.getElementById("status-401-modal-delete");
+				const status500 = document.getElementById("status-500-modal-delete");
 
 				galleryModal.addEventListener("click", async (event) => {
 					const deleteBtn = event.target.closest(".btn-delete");
@@ -286,12 +320,8 @@
 					} else if (response.status == 401) {
 						status200.classList.add("hidden");
 						status401.classList.remove("hidden");
-					} else {
-						status200.classList.add("hidden");
-						status401.classList.add("hidden");
 					}
 				});
-
 			}
 			btnConfirm.addEventListener("click", btnAddProject);
 			btnDeleteProject();
@@ -352,9 +382,9 @@
 						<h2>Photo Gallery</h2>
 					</div>
 					<div class="gallery-modal"></div>
-					<div id="status-200" class="hidden">Item deleted!</div>
-					<div id="status-401" class="hidden">You don't have access!</div>
-					<div id="status-500" class="hidden">Unexpected Behaviour</div>
+					<div id="status-200-modal-delete" class="hidden">Item deleted!</div>
+					<div id="status-401-modal-delete" class="hidden">You don't have access!</div>
+					<div id="status-500-modal-delete" class="hidden">Unexpected Behaviour</div>
 					<hr>
 					<button class="btn-add">Add a photo</button>
 				</div>
@@ -374,7 +404,6 @@
 								photo</label>
 							<input type="file" id="image_uploads" name="image_uploads" accept=".jpg, .jpeg, .png"
 								class="hidden" />
-							<div class="error-size"></div>
 							<span>jpg, png: max 4 MB</span>
 						</div>
 					</div>
@@ -389,10 +418,10 @@
 							<hr>
 						</form>
 					</div>
-					<div class="error-size hidden">Please check the size of the image</div>
-					<div id="status-400" class="hidden">You must fill both fields!</div>
-					<div id="status-401" class="hidden">You don't have access!</div>
-					<div id="status-500" class="hidden">Unexpected Behaviour</div>
+					<div id="error-size" class="hidden">Please check the size of the image</div>
+					<div id="status-400-modal-add" class="hidden">You must fill both fields!</div>
+					<div id="status-401-modal-add" class="hidden">You don't have access!</div>
+					<div id="status-500-modal-add" class="hidden">Unexpected Behaviour</div>
 					<button class="btn-confirm">Confirm</button>
 				</div>
 			</section>

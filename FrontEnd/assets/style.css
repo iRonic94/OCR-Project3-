@@ -610,10 +610,6 @@ button {
 /**Mobile**/
 
 @media screen and (max-width: 720px) {
-	body {
-		max-width: 720px;
-	}
-
 	#filters {
 		display: grid;
 		grid-template-columns: repeat(2, 1fr);
@@ -645,12 +641,10 @@ button {
 		width: 70%;
 	}
 
-
-
 	.modal {
 		height: 500px;
 		width: 300px;
-		transform: translate(-5%);
+		transform: none;
 		padding-top: 10px;
 	}
 

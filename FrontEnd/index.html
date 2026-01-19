@@ -276,7 +276,7 @@
 				});
 				const newWork = await response.json();
 				allWorks.push(newWork);
-				if (response.ok) {
+				if (response.status == 201) {
 					renderGallery(allWorks, "modal");
 					addModal.classList.add("hidden");
 					previewUpload.classList.add("hidden");
@@ -288,6 +288,7 @@
 				} else if (response.status == 400) {
 					status401.classList.add("hidden");
 					status400.classList.remove("hidden");
+					return;
 				}
 				uploadTitleImg.value = "";
 				uploadCategoryImg.value = "";

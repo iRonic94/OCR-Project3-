@@ -171,7 +171,6 @@
 			}
 
 			const openModal = function () {
-				//resetStatuses();
 				modal.classList.remove("hidden");
 				overlay.classList.remove("hidden");
 			};
@@ -182,6 +181,7 @@
 				renderGallery(allWorks, "both");
 			};
 			const addProjectsView = function () {
+				resetStatuses();
 				viewProjectsModal.classList.add("hidden");
 				addProjectsModal.classList.remove("hidden");
 			}
@@ -205,6 +205,10 @@
 			const beforePreview = document.querySelector(".before-upload");
 			const btnConfirm = document.querySelector(".btn-confirm");
 			const btnDelete = document.querySelector(".btn-delete");
+			const fileInput = document.getElementById("image_uploads");
+			const beforeUpload = document.querySelector(".before-upload");
+			const previewUpload = document.querySelector(".preview-upload");
+			const maxSize = 4 * 1024 * 1024//4mb
 
 			if (input.files.length == 0) {
 				beforePreview.classList.remove("hidden");
@@ -212,61 +216,61 @@
 				btnConfirm.classList.add("btn-disable");
 				btnConfirm.disabled = true;
 			}
-			function updateImageDisplay() {
-				preview.replaceChildren();
+
+			fileInput.addEventListener("change", function () {
 				const currentFile = input.files[0];
+				if (!(currentFile.type == "image/jpeg" || currentFile.type == "image/jpg" || currentFile.type == "image/png")) {
+					previewUpload.classList.add("hidden");
+					beforeUpload.classList.remove("hidden");
+					document.getElementById("status-500-modal-add").classList.remove("hidden");
+					document.getElementById("error-size").classList.add("hidden");
+					fileInput.value = "";
+					return;
+				}
+				if (currentFile.size > maxSize) {
+					previewUpload.classList.add("hidden");
+					beforeUpload.classList.remove("hidden");
+					document.getElementById("error-size").classList.remove("hidden");
+					document.getElementById("status-500-modal-add").classList.add("hidden");
+					fileInput.value = "";
+					return;
+				}
+
 				const img = document.createElement("img");
 				img.src = URL.createObjectURL(currentFile);
 				img.alt = currentFile.name;
-				img.setAttribute("height", "200px")
+				img.setAttribute("height", "200px");
 				img.setAttribute("id", "upImg");
-				preview.appendChild(img);
+
+				previewUpload.appendChild(img);
+				beforeUpload.classList.add("hidden");
+				previewUpload.classList.remove("hidden");
 				beforePreview.classList.add("hidden");
 				preview.classList.remove("hidden");
 				btnConfirm.classList.remove("btn-disable");
 				btnConfirm.disabled = false;
-			}
+			});
+
 			const btnAddProject = async () => {
 				const uploadTitleImg = document.getElementById("upload-title");
 				const uploadCategoryImg = document.getElementById("category-selection");
 				const addModal = document.querySelector(".add-projects-modal");
 				const viewModal = document.querySelector(".view-modal");
-				const beforeUpload = document.querySelector(".before-upload");
-				const previewUpload = document.querySelector(".preview-upload");
 				const token = localStorage.getItem("token");
 				const fileInput = document.getElementById("image_uploads");
 				const status400 = document.getElementById("status-400-modal-add");
 				const status401 = document.getElementById("status-401-modal-add");
-				const status500 = document.getElementById("status-500-modal-add");
 				const errorSize = document.getElementById("error-size");
 
 				let titleImgInput = uploadTitleImg.value;
 				let categoryImgInput = uploadCategoryImg.value;
 
 				const file = fileInput.files[0];
+				const projectDiv = document.querySelector(".modal-view-projects");
 				const formData = new FormData();
-				const maxSize = 4 * 1024 * 1024//4mb
 				formData.append("image", file);
 				formData.append("title", titleImgInput);
 				formData.append("category", categoryImgInput);
-				if (!(file.type == "image/jpeg" || file.type == "image/jpg" || file.type == "image/png")) {
-					previewUpload.classList.add("hidden");
-					beforeUpload.classList.remove("hidden");
-					status500.classList.remove("hidden");
-					uploadTitleImg.value = "";
-					uploadCategoryImg.value = "";
-					fileInput.value = "";
-					return;
-				}
-				if (file.size > maxSize) {
-					previewUpload.classList.add("hidden");
-					beforeUpload.classList.remove("hidden");
-					errorSize.classList.remove("hidden");
-					uploadTitleImg.value = "";
-					uploadCategoryImg.value = "";
-					fileInput.value = "";
-					return;
-				}
 				var response = await fetch("http://localhost:5678/api/works", {
 					method: "POST",
 					headers: {
@@ -274,9 +278,9 @@
 					},
 					body: formData
 				});
-				const newWork = await response.json();
-				allWorks.push(newWork);
-				if (response.status == 201) {
+				if (response.ok) {
+					const newWork = await response.json();
+					allWorks.push(newWork);
 					renderGallery(allWorks, "modal");
 					addModal.classList.add("hidden");
 					previewUpload.classList.add("hidden");
@@ -309,7 +313,6 @@
 					if (!projectDiv) return;
 
 					const workId = projectDiv.id;
-
 					const response = await fetch("http://localhost:5678/api/works/" + workId, {
 						method: "DELETE",
 						headers: {
@@ -329,7 +332,6 @@
 			}
 			btnConfirm.addEventListener("click", btnAddProject);
 			btnDeleteProject();
-			input.addEventListener("change", updateImageDisplay);
 		}
 		document.addEventListener("DOMContentLoaded", () => {
 			loadProjects();
@@ -424,7 +426,7 @@
 					<div id="error-size" class="hidden">Please check the size of the image</div>
 					<div id="status-400-modal-add" class="hidden">You must fill both fields!</div>
 					<div id="status-401-modal-add" class="hidden">You don't have access!</div>
-					<div id="status-500-modal-add" class="hidden">Unexpected Behaviour</div>
+					<div id="status-500-modal-add" class="hidden">File not supported please add an image</div>
 					<hr>
 					<button class="btn-confirm">Confirm</button>
 				</div>

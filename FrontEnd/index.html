@@ -110,7 +110,6 @@
 				const btnClicked = event.target.closest(".btn-filter");
 				if (!btnClicked) return; //to be sure that is not clicking outside of the scope
 				const activeBtn = document.getElementById(activeFilterId);
-				console.log("activeFilterId before:" + activeFilterId);
 				//remove active class
 				if (activeBtn) activeBtn.classList.remove("active");
 				//add active class

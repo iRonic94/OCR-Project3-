@@ -241,7 +241,7 @@
 				img.setAttribute("height", "200px");
 				img.setAttribute("id", "upImg");
 
-				previewUpload.appendChild(img);
+				previewUpload.replaceChildren(img);
 				beforeUpload.classList.add("hidden");
 				previewUpload.classList.remove("hidden");
 				beforePreview.classList.add("hidden");

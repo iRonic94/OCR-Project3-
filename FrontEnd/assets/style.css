@@ -560,7 +560,7 @@ button {
 [id*="status-200-"],
 #error-size {
 	position: absolute;
-	bottom: 100px;
+	bottom: 120px;
 }
 
 /*** login ***/
@@ -652,7 +652,7 @@ button {
 		grid-template-columns: repeat(4, 1fr);
 		gap: 5px 5px;
 		width: 320px;
-		height: 350px;
+		height: 344px;
 	}
 
 	.upload-img {
@@ -682,4 +682,12 @@ button {
 	select#category-selection {
 		font-size: 13px;
 	}
+	
+[id*="status-400-"],
+[id*="status-401-"],
+[id*="status-500-"],
+[id*="status-200-"],
+#error-size {
+	bottom: 70px;
+}
 }

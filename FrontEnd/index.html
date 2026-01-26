@@ -287,10 +287,12 @@
 					viewModal.classList.remove("hidden");
 				} else if (response.status == 401) {
 					status401.classList.remove("hidden");
+					document.getElementById("error-size").classList.add("hidden");
 					return;
 				} else if (response.status == 400) {
 					status401.classList.add("hidden");
 					status400.classList.remove("hidden");
+					document.getElementById("error-size").classList.add("hidden");
 					return;
 				}
 				uploadTitleImg.value = "";
